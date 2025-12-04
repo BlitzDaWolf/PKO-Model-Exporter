@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKO-Model-Exporter", "PKO-Model-Exporter\PKO-Model-Exporter.csproj", "{0105C803-420C-4344-91E7-925CF6138EC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKO-Model-Exporter.console", "PKO-Model-Exporter.console\PKO-Model-Exporter.console.csproj", "{4E103CBC-8B6B-4447-9B10-5705713DE528}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0105C803-420C-4344-91E7-925CF6138EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0105C803-420C-4344-91E7-925CF6138EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0105C803-420C-4344-91E7-925CF6138EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0105C803-420C-4344-91E7-925CF6138EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E103CBC-8B6B-4447-9B10-5705713DE528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E103CBC-8B6B-4447-9B10-5705713DE528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E103CBC-8B6B-4447-9B10-5705713DE528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E103CBC-8B6B-4447-9B10-5705713DE528}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
