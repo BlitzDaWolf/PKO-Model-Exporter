@@ -1,5 +1,5 @@
 using PKO_Model_Exporter.Model;
-using PKO_Model_Exporter.Model.Test;
+using PKO_Model_Exporter.Generics;
 
 namespace PKO_Model_Exporter.Importers;
 
