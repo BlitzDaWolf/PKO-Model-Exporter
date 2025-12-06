@@ -8,9 +8,9 @@ public static class Compression
 {
     public static byte[] CompressZlib(byte[] input)
     {
-        var deflater = new Deflater(1, false);
+        var deflater = new ICSharpCode.SharpZipLib.Zip.Compression.Deflater(1, false);
         using var output = new MemoryStream();
-        using (var zlib = new DeflaterOutputStream(output, deflater))
+        using (var zlib = new ICSharpCode.SharpZipLib.Zip.Compression.Streams.DeflaterOutputStream(output, deflater))
         {
             zlib.Write(input, 0, input.Length);
             zlib.Finish();

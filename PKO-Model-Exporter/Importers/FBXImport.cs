@@ -9,7 +9,7 @@ public static class FBXImport
 {
     private static Dictionary<string, Func<RawElement>> GetElementTypes = new Dictionary<string, Func<RawElement>>()
     {
-        { "FBXHeaderVersion", () => new FBXHeaderVersion() },
+        /*{ "FBXHeaderVersion", () => new FBXHeaderVersion() },
         { "FBXVersion", () => new FBXVersion() },
         { "EncryptionType", () => new EncryptionType() },
         { "Version", () => new Version() },
@@ -26,7 +26,7 @@ public static class FBXImport
         { "AnimationCurveNode", () => new AnimationCurveNode() },
         { "AnimationCurve", () => new AnimationCurve() },
         
-        { "C", () => new Connection() }
+        { "C", () => new Connection() }*/
     };
     
     public interface IElementHeader
@@ -128,7 +128,7 @@ public static class FBXImport
             {'S', (reader) => string.Join("", reader.ReadBytes(reader.ReadInt32()).Select(x => (char)x))},
         };
     
-    public static void LoadFBX(string path)
+    public static FBX LoadFBX(string path)
     {
         using var stream = File.OpenRead(path);
         using var reader = new BinaryReader(stream);
@@ -144,7 +144,7 @@ public static class FBXImport
         {
             var element = ReadElement(reader, ReadElementFunc);
             if(element is null) break;
-            fbx.Elements.Add(element);
+            fbx.Elements.Add(element.Name, element);
         }
 
         var objects = fbx.GetObjectType<SceneObject>();
@@ -168,6 +168,7 @@ public static class FBXImport
         }
 
         var rootObjects = objects.Where(x => x.Parrent == null).ToArray();
+        return fbx;
     }
 
     private static RawElement? ReadElement(BinaryReader reader, IElementHeader headerRead, long fileOffset=0)

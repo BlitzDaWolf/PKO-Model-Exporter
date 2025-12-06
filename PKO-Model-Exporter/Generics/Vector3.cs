@@ -20,4 +20,5 @@ public class Vector3
             Z = reader.ReadSingle(),
         };
     }
+    public override string ToString() =>  $"({X}, {Y}, {Z})";
 }

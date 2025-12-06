@@ -29,10 +29,22 @@ namespace PKO_Model_Exporter.Model
         public class BoneKeyInfo
         {
             // Matrix43 Mat43Seq
-            public Matrix43[] Mat43 { get; set; } // = new float[4, 3];
+            public Matrix43[] Mat43
+            {
+                set
+                {
+                    // TODO: Convert to Vector3 and Vector4
+                }
+            } // = new float[4, 3];
 
             // D3DXMATIX Mat44Seq
-            public Matrix[] Mat44 { get; set; } // = new float[3, 3];
+            public Matrix[] Mat44
+            {
+                set
+                {
+                    // TODO: Convert to Vector3 and Vector4
+                }
+            } // = new float[3, 3];
 
             // Vector3 PosSeq
             public Vector3[] PositionSeq { get; set; } // = new float[3];

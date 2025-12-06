@@ -44,8 +44,7 @@ public static class LABImporter
             for (int i = 0; i < lab.Header.BoneCount; i++)
             {
                 LAB.BoneKeyInfo key = new();
-                key.Mat43 = new Matrix43[lab.Header.FrameCount];
-                
+                //key.Mat43 = new Matrix43[lab.Header.FrameCount];
                 key.Mat43 = Enumerable.Range(0, lab.Header.FrameCount).Select(_ => Matrix43.Parse(reader)).ToArray();
                 
                 lab.KeySequnce[i] = key;
@@ -56,8 +55,7 @@ public static class LABImporter
             for (int i = 0; i < lab.Header.BoneCount; i++)
             {
                 LAB.BoneKeyInfo key = new();
-                key.Mat44 = new Matrix[lab.Header.FrameCount];
-                
+                // key.Mat44 = new Matrix[lab.Header.FrameCount];
                 key.Mat44 = Enumerable.Range(0, lab.Header.FrameCount).Select(_ => Matrix.Parse(reader)).ToArray();
                 
                 lab.KeySequnce[i] = key;

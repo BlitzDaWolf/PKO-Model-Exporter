@@ -115,7 +115,7 @@ namespace PKO_Model_Exporter.Model
 
     public class FBX
     {
-        private static byte[] MAGICHEADER =>
+        public static byte[] MAGICHEADER =>
         [
             0x4B, 0x61, 0x79, 0x64, 0x61, 0x72, 0x61, 0x20,
             0x46, 0x42, 0x58, 0x20, 0x42, 0x69, 0x6e, 0x61,
@@ -124,7 +124,7 @@ namespace PKO_Model_Exporter.Model
 
         public int Version { get; set; }
         public byte[] Header { get; set; }
-        public List<RawElement> Elements { get; set; } = new();
+        public Dictionary<string, RawElement> Elements { get; set; } = new();
 
         public bool IsValidHeader()
         {
@@ -132,6 +132,6 @@ namespace PKO_Model_Exporter.Model
             return Header.SequenceEqual(MAGICHEADER);
         }
 
-        public T[] GetObjectType<T>() where T : RawElement => Elements.SelectMany(x => x.GetObjectType<T>()).ToArray();
+        public T[] GetObjectType<T>() where T : RawElement => Elements.Values.SelectMany(x => x.GetObjectType<T>()).ToArray();
     }
 }
