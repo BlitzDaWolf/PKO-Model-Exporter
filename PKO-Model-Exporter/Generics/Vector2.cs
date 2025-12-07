@@ -19,5 +19,7 @@ public class Vector2
         };
     }
 
+    public float[] ToArray() => new[] { X, Y };
+
     public override string ToString() =>  $"({X}, {Y})";
 }

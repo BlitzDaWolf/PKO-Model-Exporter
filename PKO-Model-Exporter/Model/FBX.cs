@@ -2,9 +2,37 @@ using PKO_Model_Exporter.Model.FBXElements;
 
 namespace PKO_Model_Exporter.Model
 {
-
     namespace FBXElements
     {
+        public class Property70 : RawElement
+        {
+            public class Property : RawElement
+            {
+                public string Type => (string)Data[0];
+
+                public Property()
+                {
+                    Name = "P";
+                }
+                
+                public override string ToString() => $"Property: {Type}";
+
+                public Property Add(string name, string type, string type2, params object[] value)
+                {
+                    Data.AddRange([
+                        name, 
+                        type,
+                        type2,
+                        name.StartsWith("Lcl") ? "A" : ""
+                    ]);
+                    if (value.Length > 0)
+                        Data.AddRange(value);
+                    
+                    return this;
+                }
+            }
+        }
+        
         public class RawElement
         {
             public string Name { get; set; }
@@ -13,12 +41,20 @@ namespace PKO_Model_Exporter.Model
 
             public override string ToString() => $"[{Name}] <{Data.Count}, {SubElements.Count}>";
 
-            public T[] GetObjectType<T>() where  T : RawElement
+            public T[] GetObjectsType<T>() where  T : RawElement
             {
-                var found = SubElements.SelectMany(x => x.GetObjectType<T>()).ToArray();
+                var found = SubElements.SelectMany(x => x.GetObjectsType<T>()).ToArray();
                 if (this is T)
                     return [(T)this, ..found];
                 return found;
+            }
+
+            public T? GetObjectType<T>() where T : RawElement
+            {
+                if (this is T) return (T)this;
+                var found = SubElements.SelectMany(x => x.GetObjectsType<T>()).ToArray();
+
+                return found.FirstOrDefault();
             }
         }
 
@@ -70,6 +106,11 @@ namespace PKO_Model_Exporter.Model
                 double[] d = (double[])Data[0];
                 return Enumerable.Range(0,d.Length/3).Select(i => d.Skip(i*3).Take(3).ToArray()).ToArray();
             }
+
+            public Vertices()
+            {
+                Name = "Vertices";
+            }
         }
 
         public abstract class SceneObject : RawElement
@@ -82,13 +123,110 @@ namespace PKO_Model_Exporter.Model
             public List<SceneObject> Children { get; set; } = [];
         }
 
-        public class Geometry : SceneObject
+        namespace Geometry
         {
+            public class Geometry : SceneObject
+            {
+                public Geometry(){}
+
+                public Geometry(string name)
+                {
+                    Name = "Geometry";
+                    
+                    char zero = (char)0;
+                    char one = (char)1;
+
+                    Data.AddRange([
+                        (long)Random.Shared.NextInt64(), // ID
+                        $"{name}.001{zero}{one}Geometry", // Name
+                        "Mesh" // Type
+                    ]);
+                }
+            }
+
+            public class PolyVertexIndex : RawElement
+            {
+                public void UnPack()
+                {
+                    int[] a = (int[])Data[0];
+                    for (int i = 0; i < a.Length; i++)
+                    {
+                        if (a[i] < 0)
+                        {
+                            a[i] ^= -1;
+                        }
+                    }
+
+                    Data[0] = a;
+                }
+
+                public void Pack()
+                {
+                    int[] a = (int[])Data[0];
+                    for (int i = 1; i < a.Length; i++)
+                    {
+                        var tst = (i+1) % 3;
+                        if (tst == 0) a[i] ^= -1;
+                    }
+                    Data[0] = a;
+                }
+            }
+
+            public class Edges : RawElement
+            {
+                public void UnPack()
+                {
+                    int[] a = (int[])Data[0];
+                    for (int i = 0; i < a.Length; i++)
+                    {
+                        if (a[i] < 0)
+                        {
+                            a[i] ^= -1;
+                        }
+                    }
+
+                    Data[0] = a;
+                }
+
+                public void Pack()
+                {
+                    int[] a = (int[])Data[0];
+                    for (int i = 1; i < a.Length; i++)
+                    {
+                        var tst = (i+1) % 3;
+                        if (tst == 0) a[i] ^= -1;
+                    }
+                    Data[0] = a;
+                }
+            }
+
+            public class UV : RawElement
+            {
+                
+            }
             
+            public class UVIndex : RawElement{}
         }
 
+        
+        
         public class Model : SceneObject
         {
+            public Model(){}
+
+            public Model(string name)
+            {
+                Name = "Model";
+                    
+                char zero = (char)0;
+                char one = (char)1;
+
+                Data.AddRange([
+                    (long)Random.Shared.NextInt64(), // ID
+                    $"{name}{zero}{one}Model", // Name
+                    "Mesh" // Type
+                ]);
+            }
         }
 
         public class NodeAttribute : SceneObject
@@ -132,6 +270,6 @@ namespace PKO_Model_Exporter.Model
             return Header.SequenceEqual(MAGICHEADER);
         }
 
-        public T[] GetObjectType<T>() where T : RawElement => Elements.Values.SelectMany(x => x.GetObjectType<T>()).ToArray();
+        public T[] GetObjectType<T>() where T : RawElement => Elements.Values.SelectMany(x => x.GetObjectsType<T>()).ToArray();
     }
 }

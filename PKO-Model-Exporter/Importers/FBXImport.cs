@@ -1,6 +1,7 @@
 using PKO_Model_Exporter.Helpers;
 using PKO_Model_Exporter.Model;
 using PKO_Model_Exporter.Model.FBXElements;
+using PKO_Model_Exporter.Model.FBXElements.Geometry;
 using Version = PKO_Model_Exporter.Model.FBXElements.Version;
 
 namespace PKO_Model_Exporter.Importers;
@@ -9,7 +10,7 @@ public static class FBXImport
 {
     private static Dictionary<string, Func<RawElement>> GetElementTypes = new Dictionary<string, Func<RawElement>>()
     {
-        /*{ "FBXHeaderVersion", () => new FBXHeaderVersion() },
+        { "FBXHeaderVersion", () => new FBXHeaderVersion() },
         { "FBXVersion", () => new FBXVersion() },
         { "EncryptionType", () => new EncryptionType() },
         { "Version", () => new Version() },
@@ -20,13 +21,18 @@ public static class FBXImport
         { "NodeAttribute", () => new NodeAttribute() },
         { "Pose", () => new Pose() },
         { "Deformer", () => new Deformer() },
-        
+
         { "AnimationStack", () => new AnimationStack() },
         { "AnimationLayer", () => new AnimationLayer() },
         { "AnimationCurveNode", () => new AnimationCurveNode() },
         { "AnimationCurve", () => new AnimationCurve() },
-        
-        { "C", () => new Connection() }*/
+
+        { "C", () => new Connection() },
+
+        { "P", () => new Property70.Property() },
+        { "Properties70", () => new Property70() },
+        { "Edges", () => new Edges() },
+        { "PolygonVertexIndex", () => new PolyVertexIndex() },
     };
     
     public interface IElementHeader
@@ -168,6 +174,9 @@ public static class FBXImport
         }
 
         var rootObjects = objects.Where(x => x.Parrent == null).ToArray();
+        
+        fbx.GetObjectType<PolyVertexIndex>().ToList().ForEach(x=>x.UnPack());
+        
         return fbx;
     }
 
