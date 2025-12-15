@@ -1,8 +1,8 @@
 using PKO_Model_Exporter.Generics;
 using PKO_Model_Exporter.Helpers;
 using PKO_Model_Exporter.Model;
-using PKO_Model_Exporter.Model.FBXElements;
-using PKO_Model_Exporter.Model.FBXElements.Geometry;
+using PKO_Model_Exporter.Model.FBXModels.Elements;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Geometry;
 
 namespace PKO_Model_Exporter.Converters;
 
@@ -26,11 +26,10 @@ public static class LGOConverter
     public static FBX ToFBX(this LGO lgo)
     {
         var test = lgo.MeshInfo.TextureCord0;
+
+        var seq = lgo.MeshInfo.BlendSeq.Select(x => x.IndexD).Distinct().ToArray();
         
         FBX fbx = FBXCreator.CreateFBX();
-
-
-
         Geometry emptyGeo = FBXCreator.CreateGeometry("A");
         {
             var testIndex = lgo.MeshInfo.IndexSeq;
@@ -45,7 +44,11 @@ public static class LGOConverter
             edges.Data[0] = (object)edgesArr.ToArray();
             edges.Pack();
 
-            var uvInx = emptyGeo.GetObjectType<UVIndex>();
+            var uvInx = emptyGeo.GetObjectType<GeometryIndex>();
+            uvInx.Data[0] = edgesArr.ToArray();
+            
+            
+            var norInx = emptyGeo.GetObjectType<GeometryIndex>();
             uvInx.Data[0] = edgesArr.ToArray();
         }
         
@@ -54,15 +57,28 @@ public static class LGOConverter
         verts.Data[0] = (object)lgo.MeshInfo.VertexSeq.SelectMany(x => x.ToArray().Select(x => (double)x)).ToArray();
         emptyGeo.GetObjectType<UV>()!.Data[0] = (object)lgo.MeshInfo.TextureCord0.Select(x => new Vector2{X = x.X, Y = 1-x.Y}).SelectMany(x => x.ToArray()).Select(x => (double)x).ToArray();
         
-        Model.FBXElements.Model emptyModel = FBXCreator.CreateModel("A");
+        Model.FBXModels.Elements.Objects.Model emptyModel = FBXCreator.CreateModel("A");
         
         fbx.Elements["Connections"].SubElements.AddRange([
             new Connection{ Data = ["OO", emptyModel.Id, (long)0], Name = "C"},
             new Connection{ Data = ["OO", emptyGeo.Id, emptyModel.Id], Name = "C"}
         ]);
-        
         fbx.Elements["Objects"].SubElements.AddRange([emptyGeo, emptyModel]);
-                
+           
+        
+        if (lgo.MeshInfo is not null)
+        {
+            for (int i = 0; i < lgo.MeshInfo.BlendSeq.Length; i++)
+            {
+                var blend = lgo.MeshInfo.BlendSeq[i];
+                for (int j = 0; j < lgo.MeshInfo.Header.BoneInflFactor; j++)
+                {
+                    var boneIndex = lgo.MeshInfo.BlendIndexSeq[blend.Index[j]];
+                    Console.WriteLine($"[{i}] {boneIndex}: {blend.Weight}");
+                }
+            }
+        }
+        
         return fbx;
     }
 }

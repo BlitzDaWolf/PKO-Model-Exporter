@@ -1,5 +1,6 @@
 using PKO_Model_Exporter.Model;
 using PKO_Model_Exporter.Model.FBXElements;
+using PKO_Model_Exporter.Model.FBXModels.Elements;
 
 namespace PKO_Model_Exporter.Converters;
 

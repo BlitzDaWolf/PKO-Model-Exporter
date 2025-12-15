@@ -20,6 +20,27 @@ public class Vector3
             Z = reader.ReadSingle(),
         };
     }
+
+    public Vector3()
+    {
+        X = 0;
+        Y = 0;
+        Z = 0;
+    }
+
+    public Vector3(float[] points)
+    {
+        X =  points[0];
+        Y =  points[1];
+        Z =  points[2];
+    }
+    
+    public Vector3(double[] points)
+    {
+        X = (float)points[0];
+        Y = (float)points[1];
+        Z = (float)points[2];
+    }
     
     public float[] ToArray() => new[] { X, Y, Z };
     public override string ToString() =>  $"({X}, {Y}, {Z})";

@@ -18,6 +18,24 @@ public class Vector2
             Y =  reader.ReadSingle()
         };
     }
+    
+    public Vector2()
+    {
+        X = 0;
+        Y = 0;
+    }
+
+    public Vector2(float[] points)
+    {
+        X =  points[0];
+        Y =  points[1];
+    }
+    
+    public Vector2(double[] points)
+    {
+        X = (float)points[0];
+        Y = (float)points[1];
+    }
 
     public float[] ToArray() => new[] { X, Y };
 

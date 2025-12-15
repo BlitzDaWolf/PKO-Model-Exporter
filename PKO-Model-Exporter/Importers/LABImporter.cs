@@ -5,7 +5,7 @@ namespace PKO_Model_Exporter.Importers;
 
 public static class LABImporter
 {
-    public static void LoadLAB(string path)
+    public static LAB LoadLAB(string path)
     {
         using var stream = File.OpenRead(path);
         using var reader = new BinaryReader(stream);
@@ -26,8 +26,8 @@ public static class LABImporter
 
         lab.BaseInfo = Enumerable.Range(0, lab.Header.BoneCount).Select(x => new LAB.BoneBaseInfo
         {
-            Name = string.Join("", reader.ReadBytes(64).Select(x => (char)x)),
-            Id = reader.ReadUInt32(), ParentId = reader.ReadUInt32(),
+            Name = string.Join("", reader.ReadBytes(64).Select(x => (char)x)).Split("\0")[0],
+            Id = reader.ReadInt32(), ParentId = reader.ReadInt32(),
         }).ToArray(); //new LAB.BoneBaseInfo[lab.Header.BoneCount];
         lab.InvMat = Enumerable.Range(0, lab.Header.BoneCount).Select(_ =>  Matrix.Parse(reader)).ToArray();
 
@@ -90,5 +90,7 @@ public static class LABImporter
                 }
             }
         }
+
+        return lab;
     }
 }

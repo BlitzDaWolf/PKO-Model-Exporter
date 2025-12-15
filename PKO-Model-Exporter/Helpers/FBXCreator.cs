@@ -1,7 +1,8 @@
 using PKO_Model_Exporter.Model;
 using PKO_Model_Exporter.Model.FBXElements;
-using PKO_Model_Exporter.Model.FBXElements.Geometry;
-using Version = PKO_Model_Exporter.Model.FBXElements.Version;
+using PKO_Model_Exporter.Model.FBXModels.Elements;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Geometry;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Objects;
 
 namespace PKO_Model_Exporter.Helpers;
 
@@ -67,7 +68,7 @@ public static class FBXCreator
                 Name = "SceneInfo", Data = ["GlobalInfo SceneInfo", "UserData"],
                 SubElements = [
                     new RawElement{Name = "Type", Data = ["UserData"]},
-                    new Version{Name = "Version", Data = [100]},
+                    new RawElement{Name = "Version", Data = [100]},
                     new RawElement{Name = "MetaData"}, // TODO: Add the metadata
                     new Property70
                     {
@@ -88,7 +89,7 @@ public static class FBXCreator
         ]);
 
         globalSettings.SubElements.AddRange([
-            new Version{Name = "Version", Data = [1000]},
+            new RawElement{Name = "Version", Data = [1000]},
             new Property70
             {
                 Name = "Property70",
@@ -139,7 +140,7 @@ public static class FBXCreator
         var element = new Geometry(name);
 
         element.SubElements.AddRange([
-            new RawElement { Name = "Properties70" },
+            new Property70 { Name = "Properties70" },
             new RawElement { Name = "GeometryVersion", Data = [124] },
             new Vertices { Data = [Array.Empty<double>()] },
             new PolyVertexIndex { Name = "PolygonVertexIndex", Data = [Array.Empty<int>()] },
@@ -149,12 +150,12 @@ public static class FBXCreator
                 Name = "LayerElementNormal", Data = [0],
                 SubElements =
                 [
-                    new Version { Name = "Version", Data = [101] },
+                    new RawElement { Name = "Version", Data = [101] },
                     new RawElement { Name = "Name", Data = [""] },
                     new RawElement { Name = "MappingInformationType", Data = ["ByPolygonVertex"] },
                     new RawElement { Name = "ReferenceInformationType", Data = ["IndexToDirect"] },
                     new RawElement { Name = "Normals", Data = [Array.Empty<double>()] },
-                    /*new RawElement { Name = "NormalsIndex", Data = [Array.Empty<int>()] }*/
+                    // new NormalIndex { Name = "NormalsIndex", Data = [Array.Empty<int>()] }
                 ]
             },
             new RawElement
@@ -162,19 +163,19 @@ public static class FBXCreator
                 Name = "LayerElementUV", Data = [0],
                 SubElements =
                 [
-                    new Version { Name = "Version", Data = [101] },
+                    new RawElement { Name = "Version", Data = [101] },
                     new RawElement { Name = "Name", Data = [""] },
                     new RawElement { Name = "MappingInformationType", Data = ["ByPolygonVertex"] },
                     new RawElement { Name = "ReferenceInformationType", Data = ["IndexToDirect"] },
                     new UV() { Name = "UV", Data = [Array.Empty<double>] },
-                    new UVIndex() { Name = "UVIndex", Data = [Array.Empty<int>] }
+                    new GeometryIndex() { Name = "UVIndex", Data = [Array.Empty<int>] }
                 ]
             },
             new RawElement
             {
                 Name = "Layer", Data = [0],
                 SubElements = [
-                    new Version { Name = "Version", Data = [100] },
+                    new RawElement { Name = "Version", Data = [100] },
                     new RawElement
                     {
                         Name = "LayerElement",
@@ -198,18 +199,18 @@ public static class FBXCreator
         return element;
     }
 
-    public static Model.FBXElements.Model CreateModel(string name)
+    public static Model.FBXModels.Elements.Objects.Model CreateModel(string name)
     {
-        var element = new Model.FBXElements.Model(name);
+        var element = new Model.FBXModels.Elements.Objects.Model(name);
 
         element.SubElements.AddRange([
-            new Version{Name = "Version", Data = [232]},
+            new RawElement{Name = "Version", Data = [232]},
             new Property70
             {
                 Name = "Properties70", SubElements = [
-                    (new Property70.Property()).Add("Lcl Translation", "Lcl Translation", "", 0d,0d,0d),
-                    (new Property70.Property()).Add("Lcl Rotation", "Lcl Rotation", "", 0d,0d,0d),
-                    (new Property70.Property()).Add("Lcl Scaling", "Lcl Scaling", "", 100d,100d,100d),
+                    (new Property70.TranslationProperty()).Add("Lcl Translation", "Lcl Translation", "", 0d,0d,0d),
+                    (new Property70.RotationProperty()).Add("Lcl Rotation", "Lcl Rotation", "", 0d,0d,0d),
+                    (new Property70.ScalingProperty()).Add("Lcl Scaling", "Lcl Scaling", "", 100d,100d,100d),
                     
                     (new Property70.Property()).Add("DefaultAttributeIndex", "int", "Integer", 0),
                     (new Property70.Property()).Add("InheritType", "Enum", "", 1),
@@ -222,5 +223,17 @@ public static class FBXCreator
         ]);
         
         return element;
+    }
+
+    public static NodeAttribute CreateNodeAttribute(string name)
+    {
+        NodeAttribute na = new NodeAttribute(name);
+
+        na.SubElements.AddRange([
+            new RawElement { Name = "TypeFlags", Data = ["Null"] },
+            new Property70 { Name = "Property70" }
+        ]);
+        
+        return na;
     }
 }

@@ -274,7 +274,7 @@ public static class LGOImporter
                 {
                     Index = reader.ReadBytes(4),
                     IndexD = reader.ReadInt32(),
-                    Weight = [reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle()]
+                    Weight = Vector3.Parse(reader),
                 }).ToArray();
                 info.BlendIndexSeq =  Enumerable.Range(0, info.Header.BoneIndexCount).Select(_ => reader.ReadInt32()).ToArray();
             }

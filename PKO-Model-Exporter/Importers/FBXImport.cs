@@ -1,23 +1,41 @@
 using PKO_Model_Exporter.Helpers;
 using PKO_Model_Exporter.Model;
 using PKO_Model_Exporter.Model.FBXElements;
-using PKO_Model_Exporter.Model.FBXElements.Geometry;
-using Version = PKO_Model_Exporter.Model.FBXElements.Version;
+using PKO_Model_Exporter.Model.FBXModels.Elements;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Animation;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Animation.Keys;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Geometry;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Objects;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Property;
+using PKO_Model_Exporter.Model.FBXModels.Elements.Roots;
+using Version = PKO_Model_Exporter.Model.FBXModels.Elements.Version;
 
 namespace PKO_Model_Exporter.Importers;
 
 public static class FBXImport
 {
-    private static Dictionary<string, Func<RawElement>> GetElementTypes = new Dictionary<string, Func<RawElement>>()
+    private static Dictionary<string, Func<RawElement>> GetElementTypes = new()
     {
-        { "FBXHeaderVersion", () => new FBXHeaderVersion() },
-        { "FBXVersion", () => new FBXVersion() },
-        { "EncryptionType", () => new EncryptionType() },
-        { "Version", () => new Version() },
-        { "HeaderVersion", () => new HeaderVersion() },
+        {"FBXHeaderExtension", () => new FBXHeaderExtension()},
+        {"FileID", () => new FileID()},
+        {"CreationTime", () => new CreationTime()},
+        {"Creator", () => new Creator()},
+        {"GlobalSettings", () => new GlobalSettings()},
+        {"Documents", () => new Documents()},
+        {"References", () => new References()},
+        {"Definitions", () => new Definitions()},
+        {"Objects", () => new Objects()},
+        {"Connections", () => new Connections()},
+        {"Takes", () => new Takes()},
+        {"Default", () => new Default() },
+        {"ObjectType", () => new ObjectType()},
+        {"PropertyTemplate", () => new PropertyTemplate()},
+        {"Type", () => new FBXType()},
+        {"Name", () => new FBXName()},
+        
         { "Vertices", () => new Vertices() },
         { "Geometry", () => new Geometry() },
-        { "Model", () => new Model.FBXElements.Model() },
+        { "Model", () => new Model.FBXModels.Elements.Objects.Model() },
         { "NodeAttribute", () => new NodeAttribute() },
         { "Pose", () => new Pose() },
         { "Deformer", () => new Deformer() },
@@ -26,13 +44,27 @@ public static class FBXImport
         { "AnimationLayer", () => new AnimationLayer() },
         { "AnimationCurveNode", () => new AnimationCurveNode() },
         { "AnimationCurve", () => new AnimationCurve() },
-
+        {"KeyVer", () => new KeyVersion()},
+        {"KeyTime", () => new KeyTime()},
+        {"KeyValueFloat", () => new KeyValueFloat()},
+        {"KeyAttrFlags", () => new KeyAttributeFlag()},
+        {"KeyAttrDataFloat", () => new KeyAttributeDataFloat()},
+        {"KeyAttrRefCount", () => new KeyAttributeRefenceCount()},
+        
+        {"UV", () => new UV()},
+        {"UVIndex", () => new GeometryIndex()},
+        {"Connection", () => new Connection()},
+        
+        {"Count", () => new FBXCount()},
+        
         { "C", () => new Connection() },
 
         { "P", () => new Property70.Property() },
         { "Properties70", () => new Property70() },
         { "Edges", () => new Edges() },
         { "PolygonVertexIndex", () => new PolyVertexIndex() },
+        
+        {"Version", () => new Version()}
     };
     
     public interface IElementHeader
@@ -148,7 +180,7 @@ public static class FBXImport
         
         while (true)
         {
-            var element = ReadElement(reader, ReadElementFunc);
+            var element = ReadElement(fbx, reader, ReadElementFunc);
             if(element is null) break;
             fbx.Elements.Add(element.Name, element);
         }
@@ -158,12 +190,6 @@ public static class FBXImport
 
         foreach (var connect in Connections)
         {
-            var parrent = objects.FirstOrDefault(x => x.Id == connect.Parent);
-            var child = objects.FirstOrDefault(x => x.Id == connect.Child);
-            
-            if(child==null) continue;
-            parrent?.Children.Add(child);
-            child.Parrent = parrent;
             if (connect.ConnectionType == "OO")
             {
             }
@@ -171,6 +197,12 @@ public static class FBXImport
             {
                 
             }
+            var parrent = objects.FirstOrDefault(x => x.Id == connect.Parent);
+            var child = objects.FirstOrDefault(x => x.Id == connect.Child);
+            
+            if(child==null) continue;
+            parrent?.Children.Add(child);
+            child.Parrent = parrent;
         }
 
         var rootObjects = objects.Where(x => x.Parrent == null).ToArray();
@@ -180,7 +212,7 @@ public static class FBXImport
         return fbx;
     }
 
-    private static RawElement? ReadElement(BinaryReader reader, IElementHeader headerRead, long fileOffset=0)
+    private static RawElement? ReadElement(FBX fbx,BinaryReader reader, IElementHeader headerRead, long fileOffset=0)
     {
         (long EndOffset, long Count, long Lentgh, string Id) = headerRead.ReadElement(reader);
         if (EndOffset == 0) return null;
@@ -189,8 +221,12 @@ public static class FBXImport
         {
             element = GetElementTypes[Id]();
         }
+
+        element.FBXObject = fbx;
         element.Name = Id;
 
+        object[] dataArr = new  object[Count];
+        
         for (int i = 0; i < Count; i++)
         {
             char dataType = reader.ReadChar();
@@ -203,13 +239,15 @@ public static class FBXImport
                     data = Compression.DecompressZlib(data);
                 }
 
-                element.Data.Add(ArrayTypeReader[dataType](arrayInfo[0], data));
+                dataArr[i] = (ArrayTypeReader[dataType](arrayInfo[0], data));
             }
             else
             {
-                element.Data.Add(SingleTypeReader[dataType](reader));
+                dataArr[i] = (SingleTypeReader[dataType](reader));
             }
         }
+
+        element.Data = dataArr.ToList();
 
         if (element is RawElement && Count != 0)
         {
@@ -246,7 +284,7 @@ public static class FBXImport
             long subPos = startSubPos;
             while (subPos < subTreeEnd)
             {
-                element.SubElements.Add(ReadElement(rd, headerRead, fileOffset));
+                element.SubElements.Add(ReadElement(fbx ,rd, headerRead, fileOffset));
                 subPos = rd.BaseStream.Position;
             }
 

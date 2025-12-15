@@ -15,8 +15,8 @@ namespace PKO_Model_Exporter.Model
         public class BoneBaseInfo
         {
             public string Name { get; set; } // 64 bytes
-            public uint Id { get; set; }
-            public uint ParentId { get; set; }
+            public int Id { get; set; }
+            public int ParentId { get; set; }
         }
         public class BoneDummyInfo
         {

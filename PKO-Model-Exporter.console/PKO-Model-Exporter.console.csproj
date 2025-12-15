@@ -31,6 +31,15 @@
       <None Update="testModels\0000000000.lgo">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="testModels\0000.lab">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="testModels\boneTest.fbx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="testModels\Untitled.fbx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
